@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import ItemRenderer from "@/components/ItemRenderer";
 import Stepper from "@/components/Stepper";
@@ -13,6 +14,7 @@ interface LessonPlayerProps {
 }
 
 export default function LessonPlayer({ lesson }: LessonPlayerProps) {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -20,6 +22,8 @@ export default function LessonPlayer({ lesson }: LessonPlayerProps) {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
   const currentItem = useMemo(() => lesson.items[currentIndex], [lesson.items, currentIndex]);
+  const hasNextItem = currentIndex < lesson.items.length - 1;
+  const progressPercent = ((currentIndex + 1) / lesson.items.length) * 100;
 
   function handleAnswerSubmit(response: StudentResponse): void {
     // LessonPlayer controls grading + persistence so ItemRenderer can stay focused on UI.
@@ -67,6 +71,51 @@ export default function LessonPlayer({ lesson }: LessonPlayerProps) {
     setShowExplanation(false);
   }
 
+  if (currentItem.type === "mcq") {
+    return (
+      <section className="relative flex min-h-screen flex-col overflow-hidden bg-white text-slate-900">
+        <header className="grid h-20 grid-cols-[auto_1fr_auto] items-center border-b border-slate-200 px-2 sm:px-4">
+          <button
+            type="button"
+            onClick={() => router.push("/")}
+            aria-label="Exit lesson"
+            className="h-11 w-11 rounded-md text-4xl leading-none text-slate-400 transition-colors duration-150 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+          >
+            ×
+          </button>
+
+          <div className="mx-auto flex w-full max-w-xl items-center gap-3 px-2 sm:gap-4 sm:px-4">
+            <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-200">
+              <div
+                className="h-full rounded-full bg-emerald-500 transition-[width] duration-300 ease-out"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="h-11 w-11" aria-hidden />
+        </header>
+
+        <div className="relative flex flex-1 items-center justify-center px-4 pb-36 pt-8 sm:pb-40">
+          {currentIndex > 0 ? (
+            <button
+              type="button"
+              onClick={moveToPrevious}
+              aria-label="Previous step"
+              className="absolute left-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-slate-100 text-3xl text-slate-400 opacity-45 transition-all duration-150 hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 sm:left-8"
+            >
+              ←
+            </button>
+          ) : null}
+
+          <div className="flex w-full justify-center">
+            <ItemRenderer item={currentItem} onSubmit={handleAnswerSubmit} onNext={hasNextItem ? moveToNext : undefined} />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-5">
       <header>
@@ -74,7 +123,7 @@ export default function LessonPlayer({ lesson }: LessonPlayerProps) {
         <p className="mt-2 text-sm text-slate-700">{lesson.description}</p>
       </header>
 
-      <ItemRenderer item={currentItem} onSubmit={handleAnswerSubmit} />
+      <ItemRenderer item={currentItem} onSubmit={handleAnswerSubmit} onNext={hasNextItem ? moveToNext : undefined} />
 
       {resultMessage ? (
         <p

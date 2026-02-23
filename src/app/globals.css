@@ -17,3 +17,17 @@ body {
   background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
   color: #0f172a;
 }
+
+@keyframes mcq-result-pop {
+  0% {
+    transform: scale(0.98);
+  }
+
+  60% {
+    transform: scale(1.015);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
