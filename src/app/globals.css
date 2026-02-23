@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* Tailwind v4 theme tokens so `brand-*` utility classes are available. */
+@theme {
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  color: #0f172a;
+}
