@@ -184,6 +184,58 @@ export const lessons: Lesson[] = [
             }
           }
         }
+      },
+      {
+        id: "digital-scale-basics-q7-dragdrop-equation",
+        type: "interactive",
+        widget: "dragDropEquation",
+        prompt: "Make an Equation that Represents this situation.",
+        config: {
+          pairedVisualWidget: {
+            id: "singleDigitalScale",
+            config: {
+              scaleDisplayValue: 135,
+              scaleDisplayText: "135",
+              shapeGroups: [
+                {
+                  type: "square",
+                  count: 1,
+                  labels: [""],
+                  fill: "#cce7c8"
+                }
+              ],
+              weightGroups: [
+                {
+                  count: 1,
+                  labels: ["45"],
+                  fill: "#667286"
+                }
+              ],
+              layout: {
+                maxWidth: 560
+              }
+            }
+          },
+          tokens: [
+            { kind: "slot", slotId: "left" },
+            { kind: "text", value: "+" },
+            { kind: "slot", slotId: "middle" },
+            { kind: "text", value: "=" },
+            { kind: "slot", slotId: "right" }
+          ],
+          pieces: [
+            { id: "45", label: "45" },
+            { id: "x", label: "x" },
+            { id: "45x", label: "45x" },
+            { id: "135", label: "135" },
+            { id: "180", label: "180" }
+          ],
+          acceptedAnswers: [
+            { left: "x", middle: "45", right: "135" },
+            { left: "45", middle: "x", right: "135" }
+          ],
+          slotSize: 68
+        }
       }
     ]
   },

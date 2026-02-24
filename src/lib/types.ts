@@ -1,6 +1,6 @@
 export type ItemType = "mcq" | "freeResponse" | "interactive";
 
-export type InteractiveWidgetId = "balanceScale";
+export type InteractiveWidgetId = "balanceScale" | "dragDropEquation";
 export type VisualWidgetId = "singleDigitalScale";
 export type QuestionPart = "single" | "starterQuestion" | "satQuestion";
 
@@ -46,6 +46,44 @@ export type VisualWidget = {
   id: "singleDigitalScale";
   config: SingleDigitalScaleConfig;
 };
+
+export type DragDropLineToken =
+  | {
+      kind: "text";
+      value: string;
+      // Defaults to true when omitted.
+      latex?: boolean;
+    }
+  | {
+      kind: "slot";
+      slotId: string;
+    };
+
+export interface DragDropPiece {
+  id: string;
+  label: string;
+  // Defaults to true when omitted.
+  latex?: boolean;
+  // Number of draggable copies generated for this piece; defaults to 1.
+  uses?: number;
+}
+
+export interface DragDropEquationConfig {
+  tokens: DragDropLineToken[];
+  pieces: DragDropPiece[];
+  // Each accepted answer maps slot ids to piece ids.
+  acceptedAnswers: Array<Record<string, string>>;
+  // Optional static visual widget shown above this interaction.
+  pairedVisualWidget?: VisualWidget;
+  // Box/piece size in px. Defaults to responsive sizing when omitted.
+  slotSize?: number;
+  // Keeps one line by default; set true to allow wrapping.
+  allowWrap?: boolean;
+  // Defaults to true, so text/piece labels render as KaTeX unless overridden.
+  defaultLatex?: boolean;
+  // Distance in px for snap-to-slot behavior.
+  snapDistance?: number;
+}
 
 export interface SatQuestion {
   prompt: string;
@@ -97,7 +135,13 @@ export interface BalanceScaleInteractiveItem extends LessonItemBase {
   expectedState: BalanceState;
 }
 
-export type InteractiveItem = BalanceScaleInteractiveItem;
+export interface DragDropEquationInteractiveItem extends LessonItemBase {
+  type: "interactive";
+  widget: "dragDropEquation";
+  config: DragDropEquationConfig;
+}
+
+export type InteractiveItem = BalanceScaleInteractiveItem | DragDropEquationInteractiveItem;
 
 export type LessonItem = McqItem | FreeResponseItem | InteractiveItem;
 
@@ -112,7 +156,8 @@ export interface Lesson {
 export type StudentResponse =
   | { kind: "mcq"; selectedIndex: number | null; questionPart: QuestionPart }
   | { kind: "freeResponse"; text: string }
-  | { kind: "interactive"; value: BalanceState | null };
+  | { kind: "interactive"; widget: "balanceScale"; value: BalanceState | null }
+  | { kind: "interactive"; widget: "dragDropEquation"; isCorrect: boolean | null };
 
 export interface GradeResult {
   isCorrect: boolean;

@@ -24,6 +24,8 @@ export default function LessonPlayer({ lesson }: LessonPlayerProps) {
   const currentItem = useMemo(() => lesson.items[currentIndex], [lesson.items, currentIndex]);
   const hasNextItem = currentIndex < lesson.items.length - 1;
   const progressPercent = ((currentIndex + 1) / lesson.items.length) * 100;
+  const isImmersiveItem =
+    currentItem.type === "mcq" || (currentItem.type === "interactive" && currentItem.widget === "dragDropEquation");
 
   function handleAnswerSubmit(response: StudentResponse): void {
     // LessonPlayer controls grading + persistence so ItemRenderer can stay focused on UI.
@@ -71,7 +73,7 @@ export default function LessonPlayer({ lesson }: LessonPlayerProps) {
     setShowExplanation(false);
   }
 
-  if (currentItem.type === "mcq") {
+  if (isImmersiveItem) {
     return (
       <section className="relative flex min-h-screen flex-col overflow-hidden bg-white text-slate-900">
         <header className="grid h-20 grid-cols-[auto_1fr_auto] items-center border-b border-slate-200 px-2 sm:px-4">

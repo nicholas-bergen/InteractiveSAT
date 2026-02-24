@@ -55,14 +55,33 @@ export function gradeResponse(item: LessonItem, response: StudentResponse): Grad
       return { isCorrect: false, message: "Response type mismatch." };
     }
 
-    if (!response.value) {
-      return { isCorrect: false, message: "Please make a choice in the widget first." };
+    if (item.widget === "balanceScale") {
+      if (response.widget !== "balanceScale") {
+        return { isCorrect: false, message: "Response type mismatch." };
+      }
+
+      if (!response.value) {
+        return { isCorrect: false, message: "Please make a choice in the widget first." };
+      }
+
+      const isCorrect = response.value === item.expectedState;
+      return {
+        isCorrect,
+        message: isCorrect ? "Correct." : "Not quite. Try again."
+      };
     }
 
-    const isCorrect = response.value === item.expectedState;
+    if (response.widget !== "dragDropEquation") {
+      return { isCorrect: false, message: "Response type mismatch." };
+    }
+
+    if (response.isCorrect === null) {
+      return { isCorrect: false, message: "Please fill all boxes and check your answer first." };
+    }
+
     return {
-      isCorrect,
-      message: isCorrect ? "Correct." : "Not quite. Try again."
+      isCorrect: response.isCorrect,
+      message: response.isCorrect ? "Correct." : "Not quite. Try again."
     };
   }
 
