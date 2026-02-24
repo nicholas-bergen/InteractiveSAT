@@ -70,17 +70,20 @@ function resolveDisplayText(scaleDisplayValue: number, scaleDisplayText: string 
   return String(scaleDisplayText);
 }
 
-function getWeightTextFontSize(label: string): number {
+function getWeightTextFontSize(label: string, weightWidth: number): number {
   const charCount = Math.max(label.trim().length, 1);
-  const maxTextWidth = 34;
-  const baseFont = 22;
-  return Math.max(12, Math.min(baseFont, maxTextWidth / (charCount * 0.56)));
+  const usableTextWidth = Math.max(weightWidth * 0.66 - 12, 6);
+  const maxFromWidth = usableTextWidth / (charCount * 0.56);
+  const maxFromHeight = weightWidth * 0.42;
+  const preferredFont = 22;
+  return Math.max(6, Math.min(preferredFont, maxFromWidth, maxFromHeight));
 }
 
 function estimateWeightWidth(label: string, baseShapeSize: number): number {
   const charCount = Math.max(label.trim().length, 1);
-  const minFromShape = baseShapeSize * 1.35;
-  const minFromText = 30 + charCount * 11;
+  const minFromShape = baseShapeSize * 1.45;
+  const preferredFont = 22;
+  const minFromText = (charCount * preferredFont * 0.56 + 12) / 0.66;
   return Math.max(minFromShape, minFromText);
 }
 
@@ -91,19 +94,22 @@ function renderWeight(weight: FlattenedWeight, cx: number, groundY: number, widt
   // Align the weight base directly on the scale plate edge (no floating gap).
   const y = groundY - bodyBottomY * scale;
   const fill = weight.fill;
-  const textFontSize = getWeightTextFontSize(weight.label);
+  const textFontSize = getWeightTextFontSize(weight.label, width);
+  const textY = groundY - width * 0.24;
 
   // SVG silhouette based on the provided mock-up: ring + cap + trapezoid body + label.
   return (
-    <g key={`weight-${index}`} transform={`translate(${x} ${y}) scale(${scale})`}>
-      <circle cx="50" cy="20" r="16" fill="none" stroke={fill} strokeWidth="10" />
-      <rect x="33" y="36" width="34" height="16" rx="6" fill={fill} />
-      <polygon points="24,52 76,52 95,120 5,120" fill={fill} />
-      <polygon points="24,52 76,52 72,56 28,56" fill="#758198" />
-      <polygon points="25,58 31,58 26,74 19,74" fill="#edefef" />
-      <rect x="18" y="77" width="4" height="4" fill="#edefef" />
+    <g key={`weight-${index}`}>
+      <g transform={`translate(${x} ${y}) scale(${scale})`}>
+        <circle cx="50" cy="20" r="16" fill="none" stroke={fill} strokeWidth="10" />
+        <rect x="33" y="36" width="34" height="16" rx="6" fill={fill} />
+        <polygon points="24,52 76,52 95,120 5,120" fill={fill} />
+        <polygon points="24,52 76,52 72,56 28,56" fill="#758198" />
+        <polygon points="25,58 31,58 26,74 19,74" fill="#edefef" />
+        <rect x="18" y="77" width="4" height="4" fill="#edefef" />
+      </g>
       {weight.label ? (
-        <text x="50" y="95" textAnchor="middle" fontSize={textFontSize} fontWeight="700" fill="#f8fafc">
+        <text x={cx} y={textY} textAnchor="middle" fontSize={textFontSize} fontWeight="700" fill="#f8fafc">
           {weight.label}
         </text>
       ) : null}

@@ -28,6 +28,7 @@ interface ChoiceVisualState {
 interface McqControlsProps {
   phase: McqPhase;
   choices: string[];
+  renderChoicesAsMath: boolean;
   selectedIndex: number | null;
   answerIndex: number;
   outcome: McqOutcome;
@@ -58,6 +59,15 @@ function MathBlock({ latex }: { latex: string }) {
   );
 
   return <div className="rounded-md bg-slate-50 px-3 py-2 text-slate-900" dangerouslySetInnerHTML={{ __html: rendered }} />;
+}
+
+function MathInline({ latex, className }: { latex: string; className?: string }) {
+  const rendered = useMemo(
+    () => katex.renderToString(latex, { displayMode: false, throwOnError: false }),
+    [latex]
+  );
+
+  return <span className={className} dangerouslySetInnerHTML={{ __html: rendered }} />;
 }
 
 function getNextChoiceIndex(currentIndex: number, key: string, totalChoices: number, columns: number): number {
@@ -186,6 +196,7 @@ function iconSymbol(icon: ChoiceIcon): string {
 function McqControls({
   phase,
   choices,
+  renderChoicesAsMath,
   selectedIndex,
   answerIndex,
   outcome,
@@ -248,7 +259,11 @@ function McqControls({
               onKeyDown={(event) => onChoiceKeyDown(event, phase, choiceIndex, selectedIndex, choices.length, isLocked)}
               className={`relative flex h-12 w-full items-center justify-center rounded-xl border px-3 text-lg font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 disabled:cursor-default sm:h-[3rem] sm:text-xl ${visualState.classes}`}
             >
-              <span className={isSelected ? "font-semibold" : "font-medium"}>{choice}</span>
+              {renderChoicesAsMath ? (
+                <MathInline latex={choice} className={isSelected ? "font-semibold" : "font-medium"} />
+              ) : (
+                <span className={isSelected ? "font-semibold" : "font-medium"}>{choice}</span>
+              )}
               {visualState.icon ? (
                 <span
                   aria-hidden
@@ -611,6 +626,7 @@ export default function ItemRenderer({ item, onSubmit, onNext }: ItemRendererPro
             <McqControls
               phase="starter"
               choices={item.choices}
+              renderChoicesAsMath={Boolean(item.choicesLatex)}
               selectedIndex={selectedIndex}
               answerIndex={item.answerIndex}
               outcome={starterOutcome}
@@ -632,6 +648,7 @@ export default function ItemRenderer({ item, onSubmit, onNext }: ItemRendererPro
             <McqControls
               phase="sat"
               choices={item.satQuestion.choices}
+              renderChoicesAsMath={Boolean(item.satQuestion.choicesLatex)}
               selectedIndex={satSelectedIndex}
               answerIndex={item.satQuestion.answerIndex}
               outcome={satOutcome}

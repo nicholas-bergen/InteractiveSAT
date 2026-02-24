@@ -9,10 +9,10 @@ export const lessons: Lesson[] = [
     description: "Read static digital scale visuals and reason about shape values.",
     estimatedMinutes: 7,
     items: [
-            {
-        id: "QB-LinearEquationsInOneVariable-1.1-Step0.1.1",
+      {
+        id: "digital-scale-basics-q1",
         type: "mcq",
-        prompt: "How much does one square weigh?",
+        prompt: "How much is one square?",
         choices: ["2", "4", "6", "8"],
         answerIndex: 2,
         visualWidget: {
@@ -28,73 +28,82 @@ export const lessons: Lesson[] = [
                 fill: "#cce7c8"
               }
             ],
-            weightGroups: [
-              {
-                count: 0,
-                labels: [""],
-                fill: "#667286"
-              }
-            ],
+            weightGroups: [],
             layout: {
               maxWidth: 560
             }
           }
-        },
-      },
-            {
-        id: "QB-LinearEquationsInOneVariable-1.1-Step0.1.2",
-        type: "mcq",
-        prompt: "How much does n weigh?",
-        choices: ["2", "4", "6", "8"],
-        answerIndex: 2,
-        visualWidget: {
-          id: "singleDigitalScale",
-          config: {
-            scaleDisplayValue: 18,
-            scaleDisplayText: "18",
-            shapeGroups: [
-              {
-                type: "square",
-                count: 3,
-                labels: ["n", "n", "n"],
-                fill: "#cce7c8"
-              }
-            ],
-            weightGroups: [
-              {
-                count: 0,
-                labels: [""],
-                fill: "#667286"
-              }
-            ],
-            layout: {
-              maxWidth: 560
-            }
-          }
-        },
-        satQuestion: {
-          prompt: "What value of n satisfies the equation",
-          mathLatex: "3n = 18",
-          choices: ["2", "4", "6", "8"],
-          answerIndex: 2
         }
       },
-            {
-        id: "QB-LinearEquationsInOneVariable-1.1-Step0.2.1",
+      {
+        id: "digital-scale-basics-q2",
         type: "mcq",
-        prompt: "How much does one square weigh?",
-        choices: ["4", "5", "8", "20"],
-        answerIndex: 0,
+        prompt: "What is n?",
+        choices: ["5", "7", "10", "13"],
+        answerIndex: 1,
         visualWidget: {
           id: "singleDigitalScale",
           config: {
-            scaleDisplayValue: 28,
-            scaleDisplayText: "28",
+            scaleDisplayValue: 35,
+            scaleDisplayText: "35",
             shapeGroups: [
               {
                 type: "square",
                 count: 5,
-                labels: ["", "", ""],
+                labels: ["n", "n", "n", "n", "n"],
+                fill: "#cce7c8"
+              }
+            ],
+            weightGroups: [],
+            layout: {
+              maxWidth: 560
+            }
+          }
+        }
+      },
+      {
+        id: "digital-scale-basics-q3",
+        type: "mcq",
+        prompt: "What equation represents this this situation?",
+        choicesLatex: true,
+        choices: ["24c = 24", "6c = 24", "4c = 40", "4c = 24"],
+        answerIndex: 3,
+        visualWidget: {
+          id: "singleDigitalScale",
+          config: {
+            scaleDisplayValue: 24,
+            scaleDisplayText: "24",
+            shapeGroups: [
+              {
+                type: "square",
+                count: 4,
+                labels: ["c", "c", "c", "c"],
+                fill: "#cce7c8"
+              }
+            ],
+            weightGroups: [],
+            layout: {
+              maxWidth: 560
+            }
+          }
+        }
+      },
+      {
+        id: "digital-scale-basics-q4",
+        type: "mcq",
+        prompt: "How much is one square?",
+        choices: ["2", "5", "8", "16"],
+        answerIndex: 1,
+        visualWidget: {
+          id: "singleDigitalScale",
+          config: {
+            scaleDisplayValue: 18,
+            scaleDisplayText: "18",
+            shapeGroups: [
+              {
+                type: "square",
+                count: 2,
+                labels: ["", ""],
                 fill: "#cce7c8"
               }
             ],
@@ -109,19 +118,52 @@ export const lessons: Lesson[] = [
               maxWidth: 560
             }
           }
-        },
+        }
       },
-            {
-        id: "QB-LinearEquationsInOneVariable-1.1-Step0.2.2",
+      {
+        id: "digital-scale-basics-q5",
         type: "mcq",
-        prompt: "How much does k weigh?",
-        choices: ["4", "5", "8", "20"],
+        prompt: "What is d?",
+        choices: ["3", "5", "7", "11"],
         answerIndex: 0,
         visualWidget: {
           id: "singleDigitalScale",
           config: {
-            scaleDisplayValue: 28,
-            scaleDisplayText: "28",
+            scaleDisplayValue: 14,
+            scaleDisplayText: "14",
+            shapeGroups: [
+              {
+                type: "square",
+                count: 3,
+                labels: ["d", "d", "d"],
+                fill: "#cce7c8"
+              }
+            ],
+            weightGroups: [
+              {
+                count: 1,
+                labels: ["5"],
+                fill: "#667286"
+              }
+            ],
+            layout: {
+              maxWidth: 560
+            }
+          }
+        }
+      },
+      {
+        id: "digital-scale-basics-q6",
+        type: "mcq",
+        prompt: "What equation represents this situation?",
+        choicesLatex: true,
+        choices: ["5k + 10 = 40", "5k = 50", "10k + 5 = 40", "40k + 10 = 50"],
+        answerIndex: 0,
+        visualWidget: {
+          id: "singleDigitalScale",
+          config: {
+            scaleDisplayValue: 40,
+            scaleDisplayText: "40",
             shapeGroups: [
               {
                 type: "square",
@@ -133,7 +175,7 @@ export const lessons: Lesson[] = [
             weightGroups: [
               {
                 count: 1,
-                labels: ["8"],
+                labels: ["10"],
                 fill: "#667286"
               }
             ],
@@ -141,88 +183,6 @@ export const lessons: Lesson[] = [
               maxWidth: 560
             }
           }
-        },
-        satQuestion: {
-          prompt: "What value of k satisfies the equation",
-          mathLatex: "5k + 8 = 28",
-          choices: ["4", "5", "8", "20"],
-          answerIndex: 0
-        }
-      },
-            {
-        id: "QB-LinearEquationsInOneVariable-1.1",
-        type: "mcq",
-        prompt: "How much does one square weigh?",
-        choices: ["11", "80", "96", "704"],
-        answerIndex: 0,
-        visualWidget: {
-          id: "singleDigitalScale",
-          config: {
-            scaleDisplayValue: 88,
-            scaleDisplayText: "88",
-            shapeGroups: [
-              {
-                type: "square",
-                count: 8,
-                labels: ["", "", "", "", "", "", "", ""],
-                fill: "#cce7c8"
-              }
-            ],
-            weightGroups: [
-              {
-                count: 0,
-                labels: [""],
-                fill: "#667286"
-              }
-            ],
-            layout: {
-              maxWidth: 560
-            }
-          }
-        },
-        satQuestion: {
-          prompt: "What value of p satisfies the equation",
-          mathLatex: "8x = 88",
-          choices: ["11", "80", "96", "704"],
-          answerIndex: 0
-        }
-      },
-            {
-        id: "QB-LinearEquationsInOneVariable-1.1",
-        type: "mcq",
-        prompt: "How much does one square weigh?",
-        choices: ["14", "65", "86", "250"],
-        answerIndex: 0,
-        visualWidget: {
-          id: "singleDigitalScale",
-          config: {
-            scaleDisplayValue: 250,
-            scaleDisplayText: "250",
-            shapeGroups: [
-              {
-                type: "square",
-                count: 5,
-                labels: ["", "", "", "", ""],
-                fill: "#cce7c8"
-              }
-            ],
-            weightGroups: [
-              {
-                count: 1,
-                labels: ["180"],
-                fill: "#667286"
-              }
-            ],
-            layout: {
-              maxWidth: 560
-            }
-          }
-        },
-        satQuestion: {
-          prompt: "What value of p satisfies the equation",
-          mathLatex: "5p + 180 = 250",
-          choices: ["14", "65", "86", "250"],
-          answerIndex: 0
         }
       }
     ]

@@ -51,6 +51,8 @@ export interface SatQuestion {
   prompt: string;
   choices: string[];
   answerIndex: number;
+  // Render choices using KaTeX when true.
+  choicesLatex?: boolean;
   // Rendered in KaTeX when present.
   mathLatex?: string;
   // Optional image support for SAT-style prompts.
@@ -71,6 +73,8 @@ export interface McqItem extends LessonItemBase {
   // Starter question fields.
   choices: string[];
   answerIndex: number;
+  // Render starter choices using KaTeX when true.
+  choicesLatex?: boolean;
   // Optional static visualization shown above choices.
   visualWidget?: VisualWidget;
   // Optional second part (shown only after starter is answered correctly).
