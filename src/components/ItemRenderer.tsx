@@ -350,7 +350,7 @@ function McqControls({
               {outcome === "correct" ? "🎉" : "🔎"}
             </span>
             <p className="text-2xl font-semibold text-slate-900">
-              {outcome === "correct" ? "Correct!" : "Here&apos;s the answer"}
+              {outcome === "correct" ? "Correct!" : "Here's the answer"}
             </p>
 
             <div className="flex items-center gap-2 sm:gap-2.5">
@@ -878,7 +878,7 @@ export default function ItemRenderer({ item, onSubmit, onNext }: ItemRendererPro
                 {dragDropOutcome === "correct" ? "🎉" : "🔎"}
               </span>
               <p className="text-2xl font-semibold text-slate-900">
-                {dragDropOutcome === "correct" ? "Correct!" : "Here&apos;s the answer"}
+                {dragDropOutcome === "correct" ? "Correct!" : "Here's the answer"}
               </p>
 
               <div className="flex items-center gap-2 sm:gap-2.5">
