@@ -71,18 +71,37 @@ export function gradeResponse(item: LessonItem, response: StudentResponse): Grad
       };
     }
 
-    if (response.widget !== "dragDropEquation") {
-      return { isCorrect: false, message: "Response type mismatch." };
+    if (item.widget === "dragDropEquation") {
+      if (response.widget !== "dragDropEquation") {
+        return { isCorrect: false, message: "Response type mismatch." };
+      }
+
+      if (response.isCorrect === null) {
+        return { isCorrect: false, message: "Please fill all boxes and check your answer first." };
+      }
+
+      return {
+        isCorrect: response.isCorrect,
+        message: response.isCorrect ? "Correct." : "Not quite. Try again."
+      };
     }
 
-    if (response.isCorrect === null) {
-      return { isCorrect: false, message: "Please fill all boxes and check your answer first." };
+    if (item.widget === "equationScale") {
+      if (response.widget !== "equationScale") {
+        return { isCorrect: false, message: "Response type mismatch." };
+      }
+
+      if (response.isCorrect === null) {
+        return { isCorrect: false, message: "Please move a weight and check your answer first." };
+      }
+
+      return {
+        isCorrect: response.isCorrect,
+        message: response.isCorrect ? "Correct." : "Not quite. Try again."
+      };
     }
 
-    return {
-      isCorrect: response.isCorrect,
-      message: response.isCorrect ? "Correct." : "Not quite. Try again."
-    };
+    return { isCorrect: false, message: "Unsupported interactive widget." };
   }
 
   return { isCorrect: false, message: "Unsupported item type." };

@@ -1,6 +1,6 @@
 export type ItemType = "mcq" | "freeResponse" | "interactive";
 
-export type InteractiveWidgetId = "balanceScale" | "dragDropEquation";
+export type InteractiveWidgetId = "balanceScale" | "dragDropEquation" | "equationScale";
 export type VisualWidgetId = "singleDigitalScale";
 export type QuestionPart = "single" | "starterQuestion" | "satQuestion";
 
@@ -85,6 +85,34 @@ export interface DragDropEquationConfig {
   snapDistance?: number;
 }
 
+export interface EquationScaleWeight {
+  id: string;
+  label: string;
+  fill?: string;
+  // Defaults to true; non-removable weights stay on the scale.
+  removable?: boolean;
+}
+
+export interface EquationScaleConfig {
+  // Numeric source value shown on the digital display before removals.
+  scaleDisplayValue: number;
+  // Optional text override shown on the scale display.
+  // Set to null to show String(scaleDisplayValue).
+  scaleDisplayText?: string | null;
+  shapeGroups: ScaleShapeGroup[];
+  // Individual weight definitions for draggable/removable behavior.
+  weights: EquationScaleWeight[];
+  // Which removable weights must be off-scale for a correct check.
+  // Defaults to all removable weights.
+  requiredRemovedWeightIds?: string[];
+  // Distance in px from the platform surface used to snap back onto the scale.
+  snapBackThreshold?: number;
+  layout?: {
+    maxWidth?: number;
+    mobileBreakpoint?: number;
+  };
+}
+
 export interface SatQuestion {
   prompt: string;
   choices: string[];
@@ -141,7 +169,13 @@ export interface DragDropEquationInteractiveItem extends LessonItemBase {
   config: DragDropEquationConfig;
 }
 
-export type InteractiveItem = BalanceScaleInteractiveItem | DragDropEquationInteractiveItem;
+export interface EquationScaleInteractiveItem extends LessonItemBase {
+  type: "interactive";
+  widget: "equationScale";
+  config: EquationScaleConfig;
+}
+
+export type InteractiveItem = BalanceScaleInteractiveItem | DragDropEquationInteractiveItem | EquationScaleInteractiveItem;
 
 export type LessonItem = McqItem | FreeResponseItem | InteractiveItem;
 
@@ -157,7 +191,8 @@ export type StudentResponse =
   | { kind: "mcq"; selectedIndex: number | null; questionPart: QuestionPart }
   | { kind: "freeResponse"; text: string }
   | { kind: "interactive"; widget: "balanceScale"; value: BalanceState | null }
-  | { kind: "interactive"; widget: "dragDropEquation"; isCorrect: boolean | null };
+  | { kind: "interactive"; widget: "dragDropEquation"; isCorrect: boolean | null }
+  | { kind: "interactive"; widget: "equationScale"; isCorrect: boolean | null };
 
 export interface GradeResult {
   isCorrect: boolean;

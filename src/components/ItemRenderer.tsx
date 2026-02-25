@@ -7,7 +7,9 @@ import { useRouter } from "next/navigation";
 
 import BalanceScaleWidget from "@/components/widgets/BalanceScaleWidget";
 import DragDropEquationWidget, { DragDropEquationWidgetHandle } from "@/components/widgets/DragDropEquationWidget";
+import EquationScaleWidget, { EquationScaleWidgetHandle } from "@/components/widgets/EquationScaleWidget";
 import SingleDigitalScaleWidget from "@/components/widgets/SingleDigitalScaleWidget";
+import { navigateWithTransition } from "@/lib/pageTransition";
 import { BalanceState, LessonItem, StudentResponse, VisualWidget } from "@/lib/types";
 
 type McqOutcome = "idle" | "incorrect" | "correct" | "revealed";
@@ -393,9 +395,12 @@ export default function ItemRenderer({ item, onSubmit, onNext }: ItemRendererPro
   const [satOutcome, setSatOutcome] = useState<McqOutcome>("idle");
   const [dragDropOutcome, setDragDropOutcome] = useState<McqOutcome>("idle");
   const [dragDropCheckEnabled, setDragDropCheckEnabled] = useState(false);
+  const [equationScaleOutcome, setEquationScaleOutcome] = useState<McqOutcome>("idle");
+  const [equationScaleCheckEnabled, setEquationScaleCheckEnabled] = useState(false);
   const [isCompactLayout, setIsCompactLayout] = useState(false);
   const isMcqItem = item.type === "mcq";
   const isDragDropItem = item.type === "interactive" && item.widget === "dragDropEquation";
+  const isEquationScaleItem = item.type === "interactive" && item.widget === "equationScale";
   const hasSatPart = isMcqItem && Boolean(item.satQuestion);
   const isStarterPhase = isMcqItem && (!hasSatPart || mcqPhase === "starter");
 
@@ -405,6 +410,8 @@ export default function ItemRenderer({ item, onSubmit, onNext }: ItemRendererPro
   const satPrimaryActionRef = useRef<HTMLButtonElement | null>(null);
   const dragDropWidgetRef = useRef<DragDropEquationWidgetHandle | null>(null);
   const dragDropPrimaryActionRef = useRef<HTMLButtonElement | null>(null);
+  const equationScaleWidgetRef = useRef<EquationScaleWidgetHandle | null>(null);
+  const equationScalePrimaryActionRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -429,9 +436,12 @@ export default function ItemRenderer({ item, onSubmit, onNext }: ItemRendererPro
     setSatOutcome("idle");
     setDragDropOutcome("idle");
     setDragDropCheckEnabled(false);
+    setEquationScaleOutcome("idle");
+    setEquationScaleCheckEnabled(false);
     starterChoiceRefs.current = [];
     satChoiceRefs.current = [];
     dragDropWidgetRef.current = null;
+    equationScaleWidgetRef.current = null;
   }, [item.id]);
 
   useEffect(() => {
@@ -461,6 +471,14 @@ export default function ItemRenderer({ item, onSubmit, onNext }: ItemRendererPro
 
     dragDropPrimaryActionRef.current?.focus();
   }, [isDragDropItem, dragDropOutcome]);
+
+  useEffect(() => {
+    if (!isEquationScaleItem || equationScaleOutcome === "idle") {
+      return;
+    }
+
+    equationScalePrimaryActionRef.current?.focus();
+  }, [equationScaleOutcome, isEquationScaleItem]);
 
   if (item.type === "mcq") {
     const columns = isCompactLayout ? 1 : 2;
@@ -577,7 +595,7 @@ export default function ItemRenderer({ item, onSubmit, onNext }: ItemRendererPro
         return;
       }
 
-      router.push("/");
+      void navigateWithTransition(() => router.push("/"), "to-home");
     };
 
     const continueLabel = "Continue";
@@ -783,7 +801,7 @@ export default function ItemRenderer({ item, onSubmit, onNext }: ItemRendererPro
         return;
       }
 
-      router.push("/");
+      void navigateWithTransition(() => router.push("/"), "to-home");
     };
 
     return (
@@ -880,6 +898,117 @@ export default function ItemRenderer({ item, onSubmit, onNext }: ItemRendererPro
                       ? "border border-emerald-600 bg-emerald-500 text-white shadow-[inset_0_-2px_0_rgba(22,101,52,0.45)] hover:bg-emerald-400"
                       : "border border-slate-900 bg-slate-800 text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.35)] hover:bg-slate-700"
                   }`}
+                >
+                  Continue
+                </button>
+                <span className="text-2xl text-slate-500" aria-hidden>
+                  ⚑
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (item.type === "interactive" && item.widget === "equationScale") {
+    const handleCheck = () => {
+      if (equationScaleOutcome !== "idle") {
+        return;
+      }
+
+      const result = equationScaleWidgetRef.current?.check();
+      if (!result) {
+        return;
+      }
+
+      onSubmit({ kind: "interactive", widget: "equationScale", isCorrect: result.isCorrect });
+      setEquationScaleOutcome(result.isCorrect ? "correct" : "incorrect");
+    };
+
+    const handleTryAgain = () => {
+      setEquationScaleOutcome("idle");
+    };
+
+    const handleContinue = () => {
+      if (onNext) {
+        onNext();
+        return;
+      }
+
+      void navigateWithTransition(() => router.push("/"), "to-home");
+    };
+
+    return (
+      <div className="w-full max-w-[58rem] pb-16 sm:pb-20">
+        <div className="space-y-3 sm:space-y-4">
+          <p className="text-xl font-medium leading-[1.35] tracking-tight text-slate-900 sm:text-2xl">{item.prompt}</p>
+
+          <EquationScaleWidget ref={equationScaleWidgetRef} config={item.config} onCheckEnabledChange={setEquationScaleCheckEnabled} />
+        </div>
+
+        {equationScaleOutcome === "idle" ? (
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-slate-100/95 px-4 py-3 backdrop-blur-sm sm:py-4">
+            <div className="mx-auto flex max-w-3xl justify-center">
+              <button
+                type="button"
+                onClick={handleCheck}
+                disabled={!equationScaleCheckEnabled}
+                className={`h-12 w-full max-w-[22rem] rounded-full border text-xl font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 sm:h-[3.1rem] ${
+                  equationScaleCheckEnabled
+                    ? "border-slate-800 bg-slate-800 text-white shadow-[inset_0_-3px_0_rgba(0,0,0,0.55)] hover:bg-slate-700 active:translate-y-px"
+                    : "cursor-not-allowed border-slate-200 bg-slate-200 text-slate-500"
+                }`}
+              >
+                Check
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        {equationScaleOutcome === "incorrect" ? (
+          <div className="fixed inset-x-0 bottom-5 z-40 flex justify-center px-4">
+            <div className="w-full max-w-[34rem] rounded-2xl border border-amber-300 bg-amber-200 px-4 py-4 shadow-[0_14px_30px_rgba(120,53,15,0.12)] sm:px-5">
+              <p className="text-xl font-medium text-amber-950">That&apos;s incorrect.</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2.5">
+                <button
+                  ref={equationScalePrimaryActionRef}
+                  type="button"
+                  onClick={handleTryAgain}
+                  className="h-10 rounded-full border border-slate-900 bg-slate-900 px-5 text-lg font-semibold text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.35)] transition-all duration-150 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                >
+                  Try again
+                </button>
+                <span className="ml-auto text-2xl text-amber-900/80" aria-hidden>
+                  ⚑
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {equationScaleOutcome === "correct" ? (
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-emerald-200 bg-emerald-100/95 px-4 py-3 backdrop-blur-sm sm:py-4">
+            <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+              <span className="text-2xl" aria-hidden>
+                🎉
+              </span>
+              <p className="text-2xl font-semibold text-slate-900">Correct!</p>
+
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <button
+                  type="button"
+                  disabled
+                  className="h-10 rounded-full border border-slate-300 bg-slate-200 px-5 text-lg font-semibold text-slate-500"
+                >
+                  Why?
+                </button>
+                <button
+                  ref={equationScalePrimaryActionRef}
+                  type="button"
+                  onClick={handleContinue}
+                  className="h-10 rounded-full border border-emerald-600 bg-emerald-500 px-6 text-lg font-semibold text-white shadow-[inset_0_-2px_0_rgba(22,101,52,0.45)] transition-all duration-150 hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                 >
                   Continue
                 </button>

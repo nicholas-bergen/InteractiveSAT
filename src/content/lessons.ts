@@ -236,6 +236,36 @@ export const lessons: Lesson[] = [
           ],
           slotSize: 68
         }
+      },
+      {
+        id: "digital-scale-basics-q8-equation-scale-removal",
+        type: "interactive",
+        widget: "equationScale",
+        prompt: "Remove the 10 weight from the scale, and see how it affects the equations.",
+        config: {
+          scaleDisplayValue: 20,
+          shapeGroups: [
+            {
+              type: "square",
+              count: 2,
+              labels: ["", ""],
+              fill: "#cce7c8"
+            }
+          ],
+          weights: [
+            {
+              id: "weight-10",
+              label: "10",
+              fill: "#667286",
+              removable: true
+            }
+          ],
+          requiredRemovedWeightIds: ["weight-10"],
+          snapBackThreshold: 36,
+          layout: {
+            maxWidth: 900
+          }
+        }
       }
     ]
   },

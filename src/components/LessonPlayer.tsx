@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import ItemRenderer from "@/components/ItemRenderer";
 import Stepper from "@/components/Stepper";
 import { gradeResponse } from "@/lib/grading";
+import { navigateWithTransition } from "@/lib/pageTransition";
 import { Lesson, StudentResponse } from "@/lib/types";
 import { saveAttempt } from "@/lib/storage";
 
@@ -16,6 +17,7 @@ interface LessonPlayerProps {
 export default function LessonPlayer({ lesson }: LessonPlayerProps) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [correctItemIds, setCorrectItemIds] = useState<Set<string>>(() => new Set());
   const [showHint, setShowHint] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [resultMessage, setResultMessage] = useState<string | null>(null);
@@ -23,9 +25,12 @@ export default function LessonPlayer({ lesson }: LessonPlayerProps) {
 
   const currentItem = useMemo(() => lesson.items[currentIndex], [lesson.items, currentIndex]);
   const hasNextItem = currentIndex < lesson.items.length - 1;
-  const progressPercent = ((currentIndex + 1) / lesson.items.length) * 100;
+  const completedCorrectCount = correctItemIds.size;
+  const progressPercent = lesson.items.length === 0 ? 0 : (completedCorrectCount / lesson.items.length) * 100;
   const isImmersiveItem =
-    currentItem.type === "mcq" || (currentItem.type === "interactive" && currentItem.widget === "dragDropEquation");
+    currentItem.type === "mcq" ||
+    (currentItem.type === "interactive" &&
+      (currentItem.widget === "dragDropEquation" || currentItem.widget === "equationScale"));
 
   function handleAnswerSubmit(response: StudentResponse): void {
     // LessonPlayer controls grading + persistence so ItemRenderer can stay focused on UI.
@@ -53,6 +58,25 @@ export default function LessonPlayer({ lesson }: LessonPlayerProps) {
       setShowExplanation(false);
     }
 
+    if (grade.isCorrect) {
+      const countsTowardProgress =
+        currentItem.type !== "mcq" ||
+        !currentItem.satQuestion ||
+        (response.kind === "mcq" && response.questionPart === "satQuestion");
+
+      if (countsTowardProgress) {
+        setCorrectItemIds((current) => {
+          if (current.has(currentItem.id)) {
+            return current;
+          }
+
+          const next = new Set(current);
+          next.add(currentItem.id);
+          return next;
+        });
+      }
+    }
+
     setResultMessage(grade.message);
     setIsCorrect(grade.isCorrect);
   }
@@ -73,13 +97,17 @@ export default function LessonPlayer({ lesson }: LessonPlayerProps) {
     setShowExplanation(false);
   }
 
+  function exitLesson(): void {
+    void navigateWithTransition(() => router.push("/"), "to-home");
+  }
+
   if (isImmersiveItem) {
     return (
       <section className="relative flex min-h-screen flex-col overflow-hidden bg-white text-slate-900">
         <header className="grid h-20 grid-cols-[auto_1fr_auto] items-center border-b border-slate-200 px-2 sm:px-4">
           <button
             type="button"
-            onClick={() => router.push("/")}
+            onClick={exitLesson}
             aria-label="Exit lesson"
             className="h-11 w-11 rounded-md text-4xl leading-none text-slate-400 transition-colors duration-150 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
           >
